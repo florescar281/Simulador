@@ -63,17 +63,27 @@ class Simulador:
     
     def _inicializar_gotas_iniciales(self):
         y_ini = obtener_y_canal(CANAL_INICIO_X)
-        self.gotas.append(GotaFerrofluido(CANAL_INICIO_X + 30, y_ini))
+        self.gotas.append(GotaFerrofluido(CANAL_INICIO_X + 100, y_ini))
         
-        # Flujo 1 - Reactivo A (color azul)
-        self.flujo_reactivo_a = FlujoContinuo(CANAL_INICIO_X + 50, y_ini, 
-                                            self.densidad, self.viscosidad_actual, 
-                                            color=(80, 150, 255))
+        # Reactivo A - entrada SUPERIOR (azul)
+        self.flujo_reactivo_a = FlujoContinuo(
+            ENTRADA_A_X, 
+            y_ini, 
+            self.densidad, 
+            self.viscosidad_actual, 
+            color=(80, 150, 255),
+            offset_y=ENTRADA_A_Y_OFFSET
+        )
         
-        # Flujo 2 - Reactivo B (color verde/cian)
-        self.flujo_reactivo_b = FlujoContinuo(CANAL_INICIO_X + 80, y_ini, 
-                                            self.densidad, self.viscosidad_actual, 
-                                            color=(0, 200, 150))
+        # Reactivo B - entrada INFERIOR (verde)
+        self.flujo_reactivo_b = FlujoContinuo(
+            ENTRADA_B_X, 
+            y_ini, 
+            self.densidad, 
+            self.viscosidad_actual, 
+            color=(0, 200, 150),
+            offset_y=ENTRADA_B_Y_OFFSET
+        )
         
     def obtener_velocidad_actual(self):
         """Obtiene velocidad actual según fase y temperatura"""
@@ -281,7 +291,45 @@ class Simulador:
         # Actualizar imanes
         for iman in self.imanes:
             iman.actualizar()
-    
+
+    def dibujar_entradas_separadas(pantalla):
+        """Dibuja las dos entradas separadas que se unen"""
+        
+        # Entrada Reactivo A (superior)
+        pygame.draw.rect(pantalla, (40, 40, 55), 
+                        (ENTRADA_A_X - 30, CANAL_Y_BASE + ENTRADA_A_Y_OFFSET - 15, 50, 30))
+        pygame.draw.rect(pantalla, AZUL, 
+                        (ENTRADA_A_X - 30, CANAL_Y_BASE + ENTRADA_A_Y_OFFSET - 15, 50, 30), 2)
+        pantalla.blit(FUENTE_PEQUEÑA.render("REACTIVO A", True, AZUL), 
+                    (ENTRADA_A_X - 28, CANAL_Y_BASE + ENTRADA_A_Y_OFFSET - 12))
+        
+        # Entrada Reactivo B (inferior)
+        pygame.draw.rect(pantalla, (40, 40, 55), 
+                        (ENTRADA_B_X - 30, CANAL_Y_BASE + ENTRADA_B_Y_OFFSET - 15, 50, 30))
+        pygame.draw.rect(pantalla, (0, 200, 150), 
+                        (ENTRADA_B_X - 30, CANAL_Y_BASE + ENTRADA_B_Y_OFFSET - 15, 50, 30), 2)
+        pantalla.blit(FUENTE_PEQUEÑA.render("REACTIVO B", True, (0, 200, 150)), 
+                    (ENTRADA_B_X - 28, CANAL_Y_BASE + ENTRADA_B_Y_OFFSET - 12))
+        
+        # Tuberías que se unen
+        puntos_a = [
+            (ENTRADA_A_X - 10, CANAL_Y_BASE + ENTRADA_A_Y_OFFSET),
+            (ENTRADA_A_X + 20, CANAL_Y_BASE + ENTRADA_A_Y_OFFSET),
+            (PUNTO_UNION_X, CANAL_Y_BASE - 5)
+        ]
+        pygame.draw.lines(pantalla, AZUL, False, puntos_a, 2)
+        
+        puntos_b = [
+            (ENTRADA_B_X - 10, CANAL_Y_BASE + ENTRADA_B_Y_OFFSET),
+            (ENTRADA_B_X + 20, CANAL_Y_BASE + ENTRADA_B_Y_OFFSET),
+            (PUNTO_UNION_X, CANAL_Y_BASE + 5)
+        ]
+        pygame.draw.lines(pantalla, (0, 200, 150), False, puntos_b, 2)
+        
+        # Punto de unión
+        pygame.draw.circle(pantalla, (100, 100, 120), (PUNTO_UNION_X, CANAL_Y_BASE), 8)
+        pygame.draw.circle(pantalla, (150, 150, 180), (PUNTO_UNION_X, CANAL_Y_BASE), 8, 2)
+        
     def dibujar(self, pantalla):
         """Dibuja toda la escena"""
 

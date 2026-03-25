@@ -170,3 +170,21 @@ UMBRAL_SALIDA_RECIRCULACION = 30    # Distancia desde el inicio para salir
 # ============================================
 RUTA_IMAGEN_CANAL = "src/images/Canal-simulación.png"  # Ruta de tu imagen del canal
 AJUSTE_Y_IMAGEN_CANAL = 0  # Ajuste vertical de la imagen (positivo = abajo, negativo = arriba)
+
+# ============================================
+# CONFIGURACIÓN DE ENTRADAS SEPARADAS
+# ============================================
+# Reactivo A (entrada superior)
+ENTRADA_A_X = CANAL_INICIO_X - 150
+ENTRADA_A_Y_OFFSET = -40  # Desplazamiento hacia arriba
+
+# Reactivo B (entrada inferior)
+ENTRADA_B_X = CANAL_INICIO_X - 150
+ENTRADA_B_Y_OFFSET = 40   # Desplazamiento hacia abajo
+
+# Punto de unión donde se mezclan los dos reactivos
+PUNTO_UNION_X = CANAL_INICIO_X + 40
+PUNTO_UNION_Y = CANAL_Y_BASE           # ← Altura donde se unen
+
+# Ángulo de aproximación (cuánto se van acercando antes de unirse)
+APROXIMACION_INICIO_X = CANAL_INICIO_X - 40   # Desde dónde empiezan a acercarse

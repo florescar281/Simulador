@@ -61,7 +61,7 @@ class Renderer:
         """Dibuja la imagen del canal por encima del canal dibujado"""
         if self.imagen_canal:
             # Calcular posición para alinear con el canal
-            x_pos = CANAL_INICIO_X - 100
+            x_pos = CANAL_INICIO_X - 90
             y_pos = CANAL_Y_BASE - self.imagen_canal.get_height() // 2 + AJUSTE_Y_IMAGEN_CANAL + 20
             pantalla.blit(self.imagen_canal, (x_pos, y_pos))
     

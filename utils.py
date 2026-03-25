@@ -200,3 +200,59 @@ def obtener_y_recirculacion(x):
         return y_recirc
     
     return y_recirc
+
+def dibujar_entradas_separadas(pantalla):
+    """Dibuja las dos entradas separadas que se unen con ángulo"""
+    
+    # Entrada Reactivo A (superior)
+    pygame.draw.rect(pantalla, (40, 40, 55), 
+                    (ENTRADA_A_X - 30, CANAL_Y_BASE + ENTRADA_A_Y_OFFSET - 15, 50, 30))
+    pygame.draw.rect(pantalla, AZUL, 
+                    (ENTRADA_A_X - 30, CANAL_Y_BASE + ENTRADA_A_Y_OFFSET - 15, 50, 30), 2)
+    pantalla.blit(FUENTE_PEQUEÑA.render("REACTIVO A", True, AZUL), 
+                 (ENTRADA_A_X - 28, CANAL_Y_BASE + ENTRADA_A_Y_OFFSET - 12))
+    
+    # Entrada Reactivo B (inferior)
+    pygame.draw.rect(pantalla, (40, 40, 55), 
+                    (ENTRADA_B_X - 30, CANAL_Y_BASE + ENTRADA_B_Y_OFFSET - 15, 50, 30))
+    pygame.draw.rect(pantalla, (0, 200, 150), 
+                    (ENTRADA_B_X - 30, CANAL_Y_BASE + ENTRADA_B_Y_OFFSET - 15, 50, 30), 2)
+    pantalla.blit(FUENTE_PEQUEÑA.render("REACTIVO B", True, (0, 200, 150)), 
+                 (ENTRADA_B_X - 28, CANAL_Y_BASE + ENTRADA_B_Y_OFFSET - 12))
+    
+    # Tuberías que se unen (con ángulo suave)
+    # Línea del Reactivo A
+    puntos_a = []
+    for x in range(ENTRADA_A_X - 10, PUNTO_UNION_X + 5, 5):
+        if x < APROXIMACION_INICIO_X:
+            y = CANAL_Y_BASE + ENTRADA_A_Y_OFFSET
+        elif x < PUNTO_UNION_X:
+            progreso = (x - APROXIMACION_INICIO_X) / (PUNTO_UNION_X - APROXIMACION_INICIO_X)
+            offset = ENTRADA_A_Y_OFFSET * (1 - progreso)
+            y = CANAL_Y_BASE + offset
+        else:
+            y = CANAL_Y_BASE
+        puntos_a.append((x, y))
+    
+    if len(puntos_a) > 1:
+        pygame.draw.lines(pantalla, AZUL, False, puntos_a, 2)
+    
+    # Línea del Reactivo B
+    puntos_b = []
+    for x in range(ENTRADA_B_X - 10, PUNTO_UNION_X + 5, 5):
+        if x < APROXIMACION_INICIO_X:
+            y = CANAL_Y_BASE + ENTRADA_B_Y_OFFSET
+        elif x < PUNTO_UNION_X:
+            progreso = (x - APROXIMACION_INICIO_X) / (PUNTO_UNION_X - APROXIMACION_INICIO_X)
+            offset = ENTRADA_B_Y_OFFSET * (1 - progreso)
+            y = CANAL_Y_BASE + offset
+        else:
+            y = CANAL_Y_BASE
+        puntos_b.append((x, y))
+    
+    if len(puntos_b) > 1:
+        pygame.draw.lines(pantalla, (0, 200, 150), False, puntos_b, 2)
+    
+    # Punto de unión
+    pygame.draw.circle(pantalla, (100, 100, 120), (PUNTO_UNION_X, PUNTO_UNION_Y), 8)
+    pygame.draw.circle(pantalla, (150, 150, 180), (PUNTO_UNION_X, PUNTO_UNION_Y), 8, 2)

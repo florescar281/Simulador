@@ -53,6 +53,13 @@ class Simulador:
         """Inicializa los electroimanes"""
         for i, pos in enumerate(POS_IMANES):
             self.imanes.append(Electroiman(pos['x'], pos['y'], i))
+
+         # Agregar imán sensor (si está activo)
+        if IMAN_SENSOR_ACTIVO:
+            from entidades.electroiman import ImanSensor
+            self.imanes.append(ImanSensor(IMAN_SENSOR_POS['x'], 
+                                        IMAN_SENSOR_POS['y'], 
+                                        5))
     
     def _inicializar_gotas_iniciales(self):
         y_ini = obtener_y_canal(CANAL_INICIO_X)
@@ -72,6 +79,24 @@ class Simulador:
         """Obtiene velocidad actual según fase y temperatura"""
         return calcular_velocidad_por_fase(self.fase, self.temperatura)
     
+    def actualizar_sensor(self):
+        """Actualiza el imán sensor detectando gotas cercanas"""
+        sensor = None
+        for iman in self.imanes:
+            if hasattr(iman, 'nombre') and iman.nombre == "SENSOR":
+                sensor = iman
+                break
+        
+        if sensor:
+            # Detectar si alguna gota está cerca
+            detectado = False
+            for gota in self.gotas:
+                if sensor.detectar_gota(gota.x, gota.y):
+                    detectado = True
+            
+            # Actualizar el sensor
+            sensor.actualizar()
+
     def actualizar_fase_automatica(self):
         """Actualiza la fase automáticamente según condiciones"""
         if self.fase == 1:
@@ -251,6 +276,7 @@ class Simulador:
         self.actualizar_gotas()
         self.generar_nuevas_gotas()
         self.procesar_separacion_y_recirculacion()
+        self.actualizar_sensor()
         
         # Actualizar imanes
         for iman in self.imanes:

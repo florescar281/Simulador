@@ -56,6 +56,13 @@ POS_IMANES = [
 ]
 
 # ============================================
+# CONFIGURACIÓN DEL IMÁN SENSOR
+# ============================================
+IMAN_SENSOR_POS = {'x': 1200, 'y': 340}  # Posición del sensor
+IMAN_SENSOR_RADIO = 50                   # Radio de detección
+IMAN_SENSOR_ACTIVO = True                # Activar/desactivar
+
+# ============================================
 # VELOCIDADES POR FASE
 # ============================================
 VEL_FLUJO_BASE = 0.9

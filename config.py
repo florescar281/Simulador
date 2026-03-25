@@ -58,9 +58,16 @@ POS_IMANES = [
 # ============================================
 # CONFIGURACIÓN DEL IMÁN SENSOR
 # ============================================
-IMAN_SENSOR_POS = {'x': 1200, 'y': 340}  # Posición del sensor
-IMAN_SENSOR_RADIO = 50                   # Radio de detección
+IMAN_SENSOR_POS = {'x': 1150, 'y': 360}  # Posición del sensor
+IMAN_SENSOR_RADIO = 120                   # Radio de detección
 IMAN_SENSOR_ACTIVO = True                # Activar/desactivar
+
+# ============================================
+# CONFIGURACIÓN DE IMÁGENES DEL SENSOR
+# ============================================
+RUTA_IMAGEN_SENSOR_NORMAL = "src/images/electroiman-1-removebg-preview.png"
+RUTA_IMAGEN_SENSOR_DETECTANDO = "src/images/Electroiman-1-on.png"
+ESCALA_IMAN_SENSOR = 0.25  # Tamaño de la imagen
 
 # ============================================
 # VELOCIDADES POR FASE
@@ -157,3 +164,9 @@ CIRCULACION_Y_OFFSET = 80   # Distancia vertical desde el canal principal
 VELOCIDAD_RECIRCULACION = 0.8  # Factor de velocidad en recirculación
 UMBRAL_ENTRADA_RECIRCULACION = 40   # Distancia desde el final para entrar
 UMBRAL_SALIDA_RECIRCULACION = 30    # Distancia desde el inicio para salir
+
+# ============================================
+# CONFIGURACIÓN DE IMAGEN DEL CANAL
+# ============================================
+RUTA_IMAGEN_CANAL = "src/images/Canal-simulación.png"  # Ruta de tu imagen del canal
+AJUSTE_Y_IMAGEN_CANAL = 0  # Ajuste vertical de la imagen (positivo = abajo, negativo = arriba)

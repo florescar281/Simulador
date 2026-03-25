@@ -7,7 +7,7 @@ class PanelControl:
     
     def __init__(self):
         self.tiempo_led = 0
-        self.rect = pygame.Rect(ANCHO - 320, ALTO - 340, 300, 320)
+        self.rect = pygame.Rect(ANCHO - 310, ALTO - 320, 300, 320)
     
     def dibujar(self, pantalla, fase, fase_tiempo, temperatura, reynolds, 
                 vibracion, velocidad, ciclos, eficiencia, densidad, viscosidad, tension):

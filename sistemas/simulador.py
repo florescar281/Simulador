@@ -284,6 +284,14 @@ class Simulador:
     
     def dibujar(self, pantalla):
         """Dibuja toda la escena"""
+
+        dibujar_canal_serpenteante(pantalla)
+        dibujar_entradas(pantalla)
+        dibujar_bifurcacion_y(pantalla)
+        
+        # Dibujar canal de recirculación (NUEVO)
+        dibujar_canal_recirculacion(pantalla)
+        
         # Fondo
         self.renderer.dibujar_fondo(pantalla)
         
@@ -307,12 +315,8 @@ class Simulador:
         for iman in imanes_arriba:
             iman.dibujar(pantalla)
         
-        dibujar_canal_serpenteante(pantalla)
-        dibujar_entradas(pantalla)
-        dibujar_bifurcacion_y(pantalla)
-        
-        # Dibujar canal de recirculación (NUEVO)
-        dibujar_canal_recirculacion(pantalla)
+
+        self.renderer.dibujar_imagen_canal(pantalla)
 
         # 8. Flujos continuos
         if self.flujo_reactivo_a:
@@ -324,6 +328,7 @@ class Simulador:
         # 9. Gotas de ferrofluido
         for gota in self.gotas:
             gota.dibujar(pantalla)
+
         # Imanes por debajo  
         for iman in imanes_abajo:
             iman.dibujar(pantalla)

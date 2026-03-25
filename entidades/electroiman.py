@@ -147,12 +147,35 @@ class ImanSensor(Electroiman):
     
     def __init__(self, x, y, indice):
         super().__init__(x, y, indice)
-        self.fuerza = 0  # Sin fuerza magnética
+        self.fuerza = 0
         self.radio_influencia = IMAN_SENSOR_RADIO
         self.nombre = "SENSOR"
         self.led_encendido = False
         self.tiempo_led = 0
-        self.color_base = (100, 100, 150)  # Color gris azulado
+        
+        # Imágenes del sensor
+        self.imagen_normal = None
+        self.imagen_detectando = None
+        self.cargar_imagenes()
+    
+    def cargar_imagenes(self):
+        """Carga las imágenes del sensor"""
+        try:
+            # Cargar imagen normal
+            self.imagen_normal = pygame.image.load(RUTA_IMAGEN_SENSOR_NORMAL).convert_alpha()
+            self.imagen_normal = pygame.transform.scale(self.imagen_normal, 
+                                                        (int(self.imagen_normal.get_width() * ESCALA_IMAN_SENSOR),
+                                                         int(self.imagen_normal.get_height() * ESCALA_IMAN_SENSOR)))
+            
+            # Cargar imagen cuando detecta
+            self.imagen_detectando = pygame.image.load(RUTA_IMAGEN_SENSOR_DETECTANDO).convert_alpha()
+            self.imagen_detectando = pygame.transform.scale(self.imagen_detectando, 
+                                                            (int(self.imagen_detectando.get_width() * ESCALA_IMAN_SENSOR),
+                                                             int(self.imagen_detectando.get_height() * ESCALA_IMAN_SENSOR)))
+        except Exception as e:
+            print(f"⚠️ Error cargando imágenes del sensor: {e}")
+            self.imagen_normal = None
+            self.imagen_detectando = None
     
     def detectar_gota(self, gota_x, gota_y):
         """Detecta si una gota está cerca y enciende el LED"""
@@ -160,7 +183,7 @@ class ImanSensor(Electroiman):
         
         if dist < self.radio_influencia:
             self.led_encendido = True
-            self.tiempo_led = 15  # Mantener encendido 15 frames
+            self.tiempo_led = 15
             return True
         return False
     
@@ -168,48 +191,51 @@ class ImanSensor(Electroiman):
         """Actualiza el estado del LED"""
         super().actualizar()
         
-        # Apagar LED después de tiempo
         if self.tiempo_led > 0:
             self.tiempo_led -= 1
         else:
             self.led_encendido = False
     
     def activar(self):
-        """El sensor no se activa magnéticamente, solo detecta"""
-        pass  # No hace nada, solo detecta
+        pass
     
     def desactivar(self):
-        """El sensor no tiene estado magnético"""
         pass
     
     def dibujar(self, pantalla):
-        """Dibuja el imán sensor con estilo especial"""
-        # Base más pequeña y discreta
+        """Dibuja el imán sensor con imagen"""
+        
+        # Dibujar imagen si está disponible
+        if self.imagen_normal and self.imagen_detectando:
+            if self.led_encendido:
+                imagen = self.imagen_detectando
+            else:
+                imagen = self.imagen_normal
+            
+            # Centrar la imagen
+            rect = imagen.get_rect(center=(self.x, self.y))
+            pantalla.blit(imagen, rect)
+        else:
+            # Dibujo alternativo si no hay imágenes
+            self._dibujar_alternativo(pantalla)
+        
+        # Dibujar LED adicional (opcional, encima de la imagen)
+        self._dibujar_led(pantalla)
+    
+    def _dibujar_alternativo(self, pantalla):
+        """Dibujo alternativo sin imágenes"""
         pygame.draw.rect(pantalla, (60, 60, 80), 
                         (self.x - 20, self.y - 15, 40, 30))
         pygame.draw.rect(pantalla, (100, 100, 130), 
                         (self.x - 20, self.y - 15, 40, 30), 2)
-        
-        # Cuerpo del sensor
         pygame.draw.circle(pantalla, (80, 80, 110), (self.x, self.y), 12)
         pygame.draw.circle(pantalla, (120, 120, 150), (self.x, self.y), 12, 1)
-        
-        # LED indicador
+    
+    def _dibujar_led(self, pantalla):
+        """Dibuja el LED indicador"""
         if self.led_encendido:
-            # LED verde parpadeante cuando detecta
             led_color = (0, 255, 0)
-            # Efecto de brillo
-            pygame.draw.circle(pantalla, (0, 255, 0), (self.x + 25, self.y - 20), 8)
-            pygame.draw.circle(pantalla, (100, 255, 100), (self.x + 25, self.y - 20), 8, 2)
+            pygame.draw.circle(pantalla, led_color, (self.x + 30, self.y - 25), 8)
+            pygame.draw.circle(pantalla, (100, 255, 100), (self.x + 30, self.y - 25), 8, 2)
         else:
-            led_color = (40, 40, 40)
-            pygame.draw.circle(pantalla, led_color, (self.x + 25, self.y - 20), 6)
-        
-        # Lente del sensor
-        pygame.draw.circle(pantalla, (50, 50, 70), (self.x, self.y), 6)
-        pygame.draw.circle(pantalla, (150, 150, 200), (self.x, self.y), 4)
-        
-        # Texto "SENSOR" (opcional)
-        if self.led_encendido:
-            texto = FUENTE_PEQUEÑA.render("", True, (0, 255, 0))
-            pantalla.blit(texto, (self.x - 30, self.y - 35))
+            pygame.draw.circle(pantalla, (40, 40, 40), (self.x + 30, self.y - 25), 6)

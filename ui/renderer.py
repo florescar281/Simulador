@@ -59,7 +59,7 @@ class Renderer:
             reactor_img = pygame.image.load(RUTA_IMAGEN_REACTOR).convert_alpha()
             
             # Calcular el ancho necesario para cubrir desde la entrada hasta la salida
-            ancho_reactor = CANAL_FIN_X - CANAL_INICIO_X + 200  # +200 para cubrir entradas y salidas
+            ancho_reactor = CANAL_FIN_X - CANAL_INICIO_X  # El ancho necesario para cubrir entradas y salidas
             
             # Escalar la imagen al ancho necesario
             ancho_original = reactor_img.get_width()
@@ -67,10 +67,10 @@ class Renderer:
             escala = ancho_reactor / ancho_original
             nuevo_alto = int(alto_original * escala)
             
-            reactor_img = pygame.transform.scale(reactor_img, (ancho_reactor, nuevo_alto))
+            reactor_img = pygame.transform.scale(reactor_img, (ancho_reactor - 40, nuevo_alto - 60))
             
             # Dibujar la imagen en la posición configurada
-            pantalla.blit(reactor_img, (POS_X_IMAGEN_REACTOR, POS_Y_IMAGEN_REACTOR))
+            pantalla.blit(reactor_img, (POS_X_IMAGEN_REACTOR - 20, CANAL_Y_BASE - nuevo_alto//2 + 30))
             
         except Exception as e:
             # Si no se encuentra la imagen, no hacer nada (solo mostrar el canal por defecto)

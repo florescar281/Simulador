@@ -1,110 +1,148 @@
 import pygame
+import math
 import random
 from config import *
+from utils import obtener_y_canal
 
-class FlujoContinuo:
-    """Flujo continuo de reactivo (como agua de una pluma)"""
+class ParticulaLiquida:
+    """Partícula individual del flujo líquido"""
     
-    def __init__(self, x, y, densidad, viscosidad):
+    def __init__(self, x, y, color_base=(80, 150, 255)):
         self.x = x
         self.y = y
-        self.largo = 0  # El largo se va extendiendo
-        self.ancho = 70
-        self.alto = 45
+        self.x_original = x
+        self.vel_x = random.uniform(0.5, 1.2)
+        self.vel_y = random.uniform(-0.3, 0.3)
+        self.tam = random.uniform(5, 10)
         self.nivel_mezcla = 0.0
+        self.angulo = random.uniform(0, math.pi * 2)
+        self.color_base = color_base  # Color personalizable
+    
+    def mover(self, velocidad_base, vibracion, y_canal):
+        """Mueve la partícula siguiendo el canal"""
+        self.x += velocidad_base + self.vel_x * 0.3
+        
+        # Seguir la forma del canal
+        y_deseada = y_canal
+        
+        # Movimiento suave hacia la posición deseada
+        diferencia = y_deseada - self.y
+        self.y += diferencia * 0.1
+        
+        # Efecto de vibración por mezcla
+        if vibracion:
+            self.y += random.uniform(-0.8, 0.8)
+            self.x += random.uniform(-0.3, 0.3)
+        
+        # Movimiento ondulatorio propio (efecto de líquido)
+        self.angulo += 0.05
+        self.y += math.sin(self.angulo + self.x * 0.02) * 0.3
+    
+    def dibujar(self, pantalla):
+        """Dibuja la partícula"""
+        # Color según nivel de mezcla
+        if self.nivel_mezcla > 0.5:
+            r = min(255, self.color_base[0] + 100)
+            g = min(255, self.color_base[1] + 100)
+            b = min(255, self.color_base[2] + 50)
+            color = (r, g, b)
+        elif self.nivel_mezcla > 0.2:
+            r = min(255, self.color_base[0] + 50)
+            g = min(255, self.color_base[1] + 50)
+            b = min(255, self.color_base[2] + 25)
+            color = (r, g, b)
+        else:
+            color = self.color_base
+        
+        # Brillo según mezcla
+        brillo = int(80 + 100 * self.nivel_mezcla)
+        color_brillo = (min(255, color[0] + brillo), 
+                       min(255, color[1] + brillo), 
+                       min(255, color[2] + brillo))
+        
+        # Dibujar partícula
+        pygame.draw.circle(pantalla, color_brillo, (int(self.x), int(self.y)), int(self.tam))
+        pygame.draw.circle(pantalla, color, (int(self.x), int(self.y)), int(self.tam - 1))
+
+
+class FlujoContinuo:
+    """Flujo continuo como sistema de partículas (Fluido 1 - Reactivo A)"""
+    
+    def __init__(self, x, y, densidad, viscosidad, color=(80, 150, 255)):
+        self.x = x
+        self.y = y
         self.densidad = densidad
         self.viscosidad = viscosidad
         self.temperatura = TEMPERATURA_INICIAL
-        self.fluyendo = True
+        self.nivel_mezcla = 0.0
+        self.color = color  # Azul por defecto
         
-        # Trazadores para efecto visual
-        self.trazadores = []
-        for _ in range(80):
-            self.trazadores.append({
-                'x': random.uniform(-self.ancho/2 + 10, self.ancho/2 - 10),
-                'y': random.uniform(-self.alto/2 + 10, self.alto/2 - 10),
-                'vx': random.uniform(-0.2, 0.2),
-                'vy': random.uniform(-0.2, 0.2)
-            })
+        # Crear muchas partículas para el flujo continuo
+        self.particulas = []
+        self._crear_particulas_iniciales()
+        
+        # Control de generación continua
+        self.tiempo_entre_particulas = 0
+    
+    def _crear_particulas_iniciales(self):
+        """Crea las partículas iniciales del flujo"""
+        for i in range(80):
+            x_offset = i * 8
+            y_canal = obtener_y_canal(self.x + x_offset)
+            particula = ParticulaLiquida(self.x + x_offset, y_canal, self.color)
+            self.particulas.append(particula)
     
     def actualizar_mezcla(self, vibracion, temperatura):
-        """Actualiza nivel de mezcla"""
+        """Actualiza nivel de mezcla y temperatura"""
         self.temperatura = temperatura
         
         if vibracion:
-            self.nivel_mezcla = min(1.0, self.nivel_mezcla + 0.012)
+            self.nivel_mezcla = min(1.0, self.nivel_mezcla + 0.01)
         else:
-            self.nivel_mezcla = max(0.0, self.nivel_mezcla - 0.005)
+            self.nivel_mezcla = max(0.0, self.nivel_mezcla - 0.008)
         
-        # Mover trazadores
-        for t in self.trazadores:
-            if vibracion:
-                t['x'] += random.uniform(-0.8, 0.8)
-                t['y'] += random.uniform(-0.8, 0.8)
-            else:
-                t['x'] += t['vx']
-                t['y'] += t['vy']
-            
-            # Mantener dentro
-            t['x'] = max(-self.ancho/2 + 5, min(self.ancho/2 - 5, t['x']))
-            t['y'] = max(-self.alto/2 + 5, min(self.alto/2 - 5, t['y']))
-    
-    def extender(self, velocidad):
-        """Extiende el flujo continuamente"""
-        self.largo += velocidad
-        # Mantener el flujo dentro del canal
-        if self.x + self.largo > CANAL_FIN_X + 200:
-            self.largo = 0  # Reiniciar cuando sale (recirculación)
+        # Propagar nivel de mezcla a las partículas
+        for p in self.particulas:
+            p.nivel_mezcla = self.nivel_mezcla
     
     def mover(self, velocidad_actual):
-        """Mueve todo el flujo"""
-        self.x += velocidad_actual
+        """Mueve todas las partículas y genera nuevas"""
+        # Mover partículas existentes
+        particulas_activas = []
+        for p in self.particulas:
+            y_canal_actual = obtener_y_canal(p.x)
+            p.mover(velocidad_actual, self.nivel_mezcla > 0.3, y_canal_actual)
+            
+            # Mantener partículas dentro del canal
+            if p.x < CANAL_FIN_X + 200:
+                particulas_activas.append(p)
+            else:
+                # Reciclar al inicio
+                p.x = CANAL_INICIO_X + random.uniform(0, 50)
+                p.y = obtener_y_canal(p.x)
+                p.vel_x = random.uniform(0.5, 1.2)
+                particulas_activas.append(p)
+        
+        self.particulas = particulas_activas
+        
+        # Generar nuevas partículas continuamente
+        self.tiempo_entre_particulas += 1
+        if self.tiempo_entre_particulas > 3:
+            y_nueva = obtener_y_canal(CANAL_INICIO_X + 20)
+            nueva_particula = ParticulaLiquida(CANAL_INICIO_X + 20, y_nueva, self.color)
+            nueva_particula.nivel_mezcla = self.nivel_mezcla
+            self.particulas.append(nueva_particula)
+            self.tiempo_entre_particulas = 0
+        
+        # Limitar número de partículas
+        if len(self.particulas) > 200:
+            self.particulas = self.particulas[-200:]
     
     def dibujar(self, pantalla):
-        """Dibuja el flujo continuo"""
-        if self.largo <= 0:
-            return
-        
-        # Dibujar como un rectángulo alargado (flujo continuo)
-        ancho_visible = min(self.largo, self.ancho * 3)  # Limitar visualmente
-        
-        # Color según mezcla
-        if self.nivel_mezcla > 0.5:
-            color_fondo = (120, 80, 40)
-        elif self.nivel_mezcla > 0.2:
-            color_fondo = (70, 90, 120)
-        else:
-            color_fondo = (40, 50, 80)
-        
-        # Dibujar el flujo como un rectángulo continuo
-        rect = pygame.Rect(int(self.x - self.ancho/2), 
-                          int(self.y - self.alto/2), 
-                          int(ancho_visible), 
-                          self.alto)
-        pygame.draw.rect(pantalla, color_fondo, rect, border_radius=6)
-        pygame.draw.rect(pantalla, AZUL, rect, 2, border_radius=6)
-        
-        # Trazadores (solo en la parte visible)
-        for t in self.trazadores:
-            px = self.x + t['x']
-            py = self.y + t['y']
-            # Solo dibujar si está dentro del área visible
-            if px > self.x - self.ancho/2 and px < self.x + ancho_visible:
-                if self.nivel_mezcla > 0.5:
-                    color = (255, 200, 50)
-                    tam = 3
-                elif self.nivel_mezcla > 0.2:
-                    color = (255, 150, 50)
-                    tam = 2
-                else:
-                    color = (100, 150, 255)
-                    tam = 2
-                pygame.draw.circle(pantalla, color, (int(px), int(py)), tam)
-        
-        # Barra de mezcla
-        if self.nivel_mezcla > 0.05:
-            barra_x = self.x + ancho_visible + 5
-            barra_y = self.y - self.alto/2
-            alto_barra = self.alto * self.nivel_mezcla
-            pygame.draw.rect(pantalla, NARANJA,
-                           (int(barra_x), int(barra_y + self.alto - alto_barra), 4, int(alto_barra)))
+        """Dibuja todas las partículas del flujo"""
+        for p in sorted(self.particulas, key=lambda p: p.x):
+            p.dibujar(pantalla)
+    
+    def obtener_eficiencia(self):
+        """Devuelve la eficiencia de mezcla actual"""
+        return self.nivel_mezcla * 100

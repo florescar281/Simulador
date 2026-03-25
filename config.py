@@ -39,20 +39,20 @@ CANAL_INICIO_X = 180
 CANAL_FIN_X = 1100
 CANAL_Y_BASE = 280
 CANAL_ALTO = 55
-AMPLITUD_SERPIENTE = 45
-FRECUENCIA_SERPIENTE = 0.012
-CANAL_RECTO_HASTA_X = 650    # Cambia este valor para alargar/acortar la parte recta
-AMPLITUD_SERPIENTE = 28      # Aumenta para más amplitud, disminuye para menos
-FRECUENCIA_SERPIENTE = 0.018 # Aumenta para más oscilaciones, disminuye para menos
+AMPLITUD_SERPIENTE = 30
+FRECUENCIA_SERPIENTE = 0.05
+CANAL_RECTO_HASTA_X = 600    # Cambia este valor para alargar/acortar la parte recta
+CANAL_SERPIENTE_HASTA_X = 850 # Fin de la sección serpenteante (nueva variable)
+
 # ============================================
 # POSICIONES DE LOS IMANES
 # ============================================
 POS_IMANES = [
-    {'x': 320, 'y': 295},   # Iman 1 - Captura
-    {'x': 480, 'y': 270},   # Iman 2
-    {'x': 640, 'y': 310},   # Iman 3 - Mezcla
-    {'x': 800, 'y': 285},   # Iman 4
-    {'x': 960, 'y': 315},   # Iman 5 - Transporte final
+    {'x': 320, 'y': 240},   # Iman 1 - Captura
+    {'x': 380, 'y': 310},   # Iman 2
+    {'x': 440, 'y': 240},   # Iman 3 - Mezcla
+    {'x': 500, 'y': 310},   # Iman 4
+    {'x': 560, 'y': 240},   # Iman 5 - Transporte final
 ]
 
 # ============================================
@@ -91,8 +91,8 @@ COEFICIENTE_VISCOSIDAD_TEMP = 0.6  # Factor de reducción de viscosidad con temp
 # ============================================
 # PARÁMETROS DE GENERACIÓN DE GOTAS
 # ============================================
-FRAMES_ENTRE_GOTAS = 40        # Aprox 0.66 segundos a 60 FPS
-MAX_GOTAS_SIMULTANEAS = 6
+FRAMES_ENTRE_GOTAS = 100        # Aprox 0.66 segundos a 60 FPS
+MAX_GOTAS_SIMULTANEAS = 10
 
 # ============================================
 # INICIALIZACIÓN DE FUENTES
@@ -125,4 +125,17 @@ RUTA_FONDO = "SRC/images/fondo.png"  # Asegúrate de tener esta imagen en la car
 # ============================================
 RUTA_IMAGEN_REACTOR = "src/images/Base_reactor.png"  # Ruta de tu imagen
 POS_X_IMAGEN_REACTOR = 150  # Posición X donde empieza la imagen
-POS_Y_IMAGEN_REACTOR = 220  # Posición Y donde empieza la imagen
+POS_Y_IMAGEN_REACTOR = 180  # Posición Y donde empieza la imagen
+
+# ============================================
+
+# CONFIGURACIÓN DE IMÁGENES DE ELECTROIMANES
+# ============================================
+RUTA_IMAGEN_ELECTROIMAN_INACTIVO = "src/images/electroiman-2.png"
+RUTA_IMAGEN_ELECTROIMAN_ACTIVO = "src/images/electroiman-on.png"
+ESCALA_IMAN = 0.2  # Ajusta el tamaño
+
+# Posición del LED
+LED_OFFSET_X = 35
+LED_OFFSET_Y = -25
+LED_RADIO = 8

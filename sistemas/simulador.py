@@ -56,9 +56,17 @@ class Simulador:
     def _inicializar_gotas_iniciales(self):
         y_ini = obtener_y_canal(CANAL_INICIO_X)
         self.gotas.append(GotaFerrofluido(CANAL_INICIO_X + 30, y_ini))
-        # Un solo flujo continuo en lugar de múltiples segmentos
-        self.flujo_reactivo = FlujoContinuo(CANAL_INICIO_X + 50, y_ini, self.densidad, self.viscosidad_actual)
-    
+        
+        # Flujo 1 - Reactivo A (color azul)
+        self.flujo_reactivo_a = FlujoContinuo(CANAL_INICIO_X + 50, y_ini, 
+                                            self.densidad, self.viscosidad_actual, 
+                                            color=(80, 150, 255))
+        
+        # Flujo 2 - Reactivo B (color verde/cian)
+        self.flujo_reactivo_b = FlujoContinuo(CANAL_INICIO_X + 80, y_ini, 
+                                            self.densidad, self.viscosidad_actual, 
+                                            color=(0, 200, 150))
+        
     def obtener_velocidad_actual(self):
         """Obtiene velocidad actual según fase y temperatura"""
         return calcular_velocidad_por_fase(self.fase, self.temperatura)
@@ -144,12 +152,15 @@ class Simulador:
                     self.viscosidad_actual, velocidad)
             gota.actualizar_deformacion(self.imanes)
         
-        # Actualizar flujo continuo
-        if self.flujo_reactivo:
-            self.flujo_reactivo.mover(velocidad)
-            self.flujo_reactivo.actualizar_mezcla(self.fase == 3, self.temperatura)
-            self.flujo_reactivo.extender(velocidad)
-    
+        # Actualizar ambos flujos
+        if self.flujo_reactivo_a:
+            self.flujo_reactivo_a.mover(velocidad)
+            self.flujo_reactivo_a.actualizar_mezcla(self.fase == 3, self.temperatura)
+        
+        if self.flujo_reactivo_b:
+            self.flujo_reactivo_b.mover(velocidad)
+            self.flujo_reactivo_b.actualizar_mezcla(self.fase == 3, self.temperatura)
+        
     def generar_nuevas_gotas(self):
         """Genera nuevas gotas de ferrofluido de forma continua"""
         self.tiempo_entre_gotas += 1
@@ -172,12 +183,16 @@ class Simulador:
         
         self.gotas = nuevas_gotas
         
-        # Reiniciar flujo continuo cuando sale
-        if self.flujo_reactivo and self.flujo_reactivo.x > CANAL_FIN_X + 100:
+        # Reciclar flujos cuando salen
+        if self.flujo_reactivo_a and self.flujo_reactivo_a.x > CANAL_FIN_X + 100:
             y_nueva = obtener_y_canal(CANAL_INICIO_X)
-            self.flujo_reactivo.x = CANAL_INICIO_X + 50
-            self.flujo_reactivo.y = y_nueva
-            self.flujo_reactivo.largo = 0
+            self.flujo_reactivo_a.x = CANAL_INICIO_X + 50
+            self.flujo_reactivo_a.y = y_nueva
+        
+        if self.flujo_reactivo_b and self.flujo_reactivo_b.x > CANAL_FIN_X + 100:
+            y_nueva = obtener_y_canal(CANAL_INICIO_X)
+            self.flujo_reactivo_b.x = CANAL_INICIO_X + 80
+            self.flujo_reactivo_b.y = y_nueva
     
     def calcular_reynolds_actual(self):
         """Calcula el Reynolds actual en tiempo real"""
@@ -186,9 +201,9 @@ class Simulador:
         return calcular_reynolds(velocidad, self.densidad, self.viscosidad_actual, diametro)
     
     def obtener_eficiencia_mezcla(self):
-        if not self.flujo_reactivo:
-            return 0
-        return self.flujo_reactivo.nivel_mezcla * 100
+        eficiencia_a = self.flujo_reactivo_a.obtener_eficiencia() if self.flujo_reactivo_a else 0
+        eficiencia_b = self.flujo_reactivo_b.obtener_eficiencia() if self.flujo_reactivo_b else 0
+        return (eficiencia_a + eficiencia_b) / 2
     
     def actualizar(self):
         """Actualiza toda la simulación"""
@@ -215,22 +230,39 @@ class Simulador:
         # Título
         self.renderer.dibujar_titulo(pantalla)
         
+        # imanes por encima
+        imanes_arriba = []
+        imanes_abajo = []
+
+        for iman in self.imanes:
+            if iman.y < CANAL_Y_BASE:
+                imanes_arriba.append(iman)
+            else:
+                imanes_abajo.append(iman)
+
+        # Imanes por encima del canal
+        for iman in imanes_arriba:
+            iman.dibujar(pantalla)
+        
         # Canal y elementos estructurales
         dibujar_canal_serpenteante(pantalla)
         dibujar_entradas(pantalla)
         dibujar_bifurcacion_y(pantalla)
+
+    # 8. Flujos continuos
+        if self.flujo_reactivo_a:
+            self.flujo_reactivo_a.dibujar(pantalla)
         
-        # Imanes
-        for iman in self.imanes:
-            iman.dibujar(pantalla)
+        if self.flujo_reactivo_b:
+            self.flujo_reactivo_b.dibujar(pantalla)
         
-        # Flujo continuo de reactivo (detrás de las gotas)
-        if self.flujo_reactivo:
-            self.flujo_reactivo.dibujar(pantalla)
-        
-        # Gotas de ferrofluido (encima del flujo)
+        # 9. Gotas de ferrofluido
         for gota in self.gotas:
             gota.dibujar(pantalla)
+        # Imanes por debajo  
+        for iman in imanes_abajo:
+            iman.dibujar(pantalla)
+        
         
         # Panel de control
         self.panel.dibujar(

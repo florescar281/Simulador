@@ -3,27 +3,28 @@ import math
 from config import *
 
 def obtener_y_canal(x):
-    """
-    Calcula la coordenada Y del canal en posición x.
-    Desde CANAL_INICIO_X hasta CANAL_RECTO_HASTA_X: línea recta
-    Desde CANAL_RECTO_HASTA_X hasta CANAL_FIN_X: forma serpenteante
-    """
-    # Antes del inicio del canal
-    if x < CANAL_INICIO_X:
+        """
+        Calcula la coordenada Y del canal en posición x.
+        - Recto desde inicio hasta CANAL_RECTO_HASTA_X
+        - Serpenteante desde CANAL_RECTO_HASTA_X hasta 1000
+        - Recto desde 1000 hasta el final
+        """
+        if x < CANAL_INICIO_X:
+            return CANAL_Y_BASE
+        if x > CANAL_FIN_X:
+            return CANAL_Y_BASE
+        
+        # Sección recta inicial
+        if x <= CANAL_RECTO_HASTA_X:
+            return CANAL_Y_BASE
+        
+        # Sección serpenteante (hasta x=1000)
+        if x <= CANAL_SERPIENTE_HASTA_X:
+            offset = AMPLITUD_SERPIENTE * math.sin((x - CANAL_RECTO_HASTA_X) * FRECUENCIA_SERPIENTE)
+            return CANAL_Y_BASE + offset
+        
+        # Sección recta final (después de 1000)
         return CANAL_Y_BASE
-    
-    # Después del final del canal
-    if x > CANAL_FIN_X:
-        return CANAL_Y_BASE
-    
-    # Sección recta (desde el inicio hasta CANAL_RECTO_HASTA_X)
-    if x <= CANAL_RECTO_HASTA_X:
-        return CANAL_Y_BASE
-    
-    # Sección serpenteante (desde CANAL_RECTO_HASTA_X hasta CANAL_FIN_X)
-    # Calcular offset con seno, pero solo en la zona serpenteante
-    offset = AMPLITUD_SERPIENTE * math.sin((x - CANAL_RECTO_HASTA_X) * FRECUENCIA_SERPIENTE)
-    return CANAL_Y_BASE + offset
 
 
 def dibujar_canal_serpenteante(pantalla):

@@ -2,6 +2,7 @@ import pygame
 import math
 import random
 from config import *
+from utils import obtener_y_canal
 
 class GotaFerrofluido:
     """Gota de ferrofluido con deformación por campo magnético y efecto metálico"""
@@ -18,6 +19,7 @@ class GotaFerrofluido:
         self.intensidad_campo = 0
         self.recirculando = False
         self.tiempo_vida = 0
+        self.en_recirculacion = False
         
         # Partículas internas para efecto metálico
         self.particulas = []
@@ -61,14 +63,11 @@ class GotaFerrofluido:
             
     
     def mover(self, imanes, vibracion, temperatura, viscosidad_actual, velocidad_fase):
-        """Mueve la gota con influencia magnética y térmica"""
+        """Mueve la gota"""
         self.tiempo_vida += 1
         
-        # Ajustar velocidad por temperatura (menor viscosidad = mayor velocidad)
-        factor_temp = 1 + (temperatura - MIN_TEMPERATURA) / MAX_TEMPERATURA * 0.3
-        
-        # Movimiento base con velocidad de fase
-        self.x += velocidad_fase * factor_temp
+        # Movimiento base
+        self.x += velocidad_fase
         self.y += self.vel_y
         
         # Atracción magnética
@@ -78,19 +77,19 @@ class GotaFerrofluido:
                 dy = iman.y - self.y
                 dist = math.sqrt(dx*dx + dy*dy)
                 if dist < RADIO_INFLUENCIA_IMAN:
-                    fuerza = iman.intensidad * (1 - dist / RADIO_INFLUENCIA_IMAN) * 0.8
+                    fuerza = iman.intensidad * (1 - dist / RADIO_INFLUENCIA_IMAN) * 0.5
                     self.x += dx * fuerza
                     self.y += dy * fuerza
         
-        # Vibración por mezcla activa
+        # Vibración por mezcla
         if vibracion:
-            self.x += random.uniform(-0.6, 0.6)
-            self.y += random.uniform(-0.5, 0.5)
+            self.x += random.uniform(-0.4, 0.4)
+            self.y += random.uniform(-0.3, 0.3)
         
-        # Ajuste Y al canal serpenteante
-        from config import obtener_y_canal
+        # IMPORTANTE: Ajustar Y al canal serpenteante
         y_canal = obtener_y_canal(self.x)
-        self.y = y_canal + random.uniform(-3, 3)
+        self.y = y_canal + random.uniform(-2, 2)  # Pequeño offset para efecto visual
+        
     
     def dibujar(self, pantalla):
         """Dibuja la gota con forma ovalada"""

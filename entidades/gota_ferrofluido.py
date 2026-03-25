@@ -2,7 +2,7 @@ import pygame
 import math
 import random
 from config import *
-from utils import obtener_y_canal
+from utils import obtener_y_canal, obtener_y_recirculacion
 
 class GotaFerrofluido:
     """Gota de ferrofluido con deformación por campo magnético y efecto metálico"""
@@ -66,7 +66,11 @@ class GotaFerrofluido:
         """Mueve la gota"""
         self.tiempo_vida += 1
         
-        # Movimiento base
+        # Si está en recirculación, NO hacer nada aquí (el movimiento se maneja en simulador)
+        if hasattr(self, 'en_recirculacion') and self.en_recirculacion:
+            return  # El movimiento se controla en procesar_separacion_y_recirculacion
+        
+        # Movimiento normal en canal principal (hacia la derecha)
         self.x += velocidad_fase
         self.y += self.vel_y
         
@@ -86,11 +90,11 @@ class GotaFerrofluido:
             self.x += random.uniform(-0.4, 0.4)
             self.y += random.uniform(-0.3, 0.3)
         
-        # IMPORTANTE: Ajustar Y al canal serpenteante
+        # Ajustar Y al canal
         y_canal = obtener_y_canal(self.x)
-        self.y = y_canal + random.uniform(-2, 2)  # Pequeño offset para efecto visual
+        self.y = y_canal + random.uniform(-2, 2)
         
-    
+            
     def dibujar(self, pantalla):
         """Dibuja la gota con forma ovalada"""
         # Sombra (ovalada)

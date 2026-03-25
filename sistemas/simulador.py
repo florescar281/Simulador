@@ -1,4 +1,5 @@
 import pygame
+import random
 from config import *
 from entidades import GotaFerrofluido,  FlujoContinuo, Electroiman
 from sistemas.fisica import (
@@ -8,7 +9,7 @@ from sistemas.fisica import (
     obtener_nombre_fase,
     obtener_color_fase
 )
-from utils import obtener_y_canal, dibujar_canal_serpenteante, dibujar_entradas, dibujar_bifurcacion_y
+from utils import *
 from ui.panel import PanelControl
 from ui.renderer import Renderer
 
@@ -146,8 +147,12 @@ class Simulador:
     
     def actualizar_gotas(self):
         velocidad = self.obtener_velocidad_actual()
-        
+    
         for gota in self.gotas:
+            # Debug para ver posición de gotas cercanas al final
+            if gota.x > CANAL_FIN_X - 50 and not hasattr(gota, 'en_recirculacion'):
+                print(f"Gota cerca del final: x={gota.x}, en_recirculacion={hasattr(gota, 'en_recirculacion')}")
+            
             gota.mover(self.imanes, self.fase == 3, self.temperatura, 
                     self.viscosidad_actual, velocidad)
             gota.actualizar_deformacion(self.imanes)
@@ -170,20 +175,51 @@ class Simulador:
             self.tiempo_entre_gotas = 0
     
     def procesar_separacion_y_recirculacion(self):
+        """Procesa la recirculación de gotas a través del canal de recirculación"""
         nuevas_gotas = []
+        velocidad_actual = self.obtener_velocidad_actual()
         
         for gota in self.gotas:
-            if gota.x > CANAL_FIN_X - 30:
-                y_nueva = obtener_y_canal(CANAL_INICIO_X)
-                gota.x = CANAL_INICIO_X + 10
-                gota.y = y_nueva
-                nuevas_gotas.append(gota)
+            # Verificar si la gota está en el canal de recirculación
+            if hasattr(gota, 'en_recirculacion') and gota.en_recirculacion:
+                # MOVER HACIA LA IZQUIERDA (x disminuye)
+                gota.x -= velocidad_actual * VELOCIDAD_RECIRCULACION  # ← Restar para ir hacia atrás
+                
+                # Actualizar Y según posición
+                y_recirc = obtener_y_recirculacion(gota.x)
+                if y_recirc:
+                    gota.y = y_recirc + random.uniform(-2, 2)
+                
+                # Verificar si ya llegó al inicio del canal (ZONA DE SALIDA)
+                if gota.x <= CANAL_INICIO_X + 30:
+                    gota.en_recirculacion = False
+                    gota.x = CANAL_INICIO_X + 20
+                    gota.y = obtener_y_canal(gota.x)
+                    nuevas_gotas.append(gota)
+                else:
+                    nuevas_gotas.append(gota)
+            
+            # Verificar si la gota debe entrar al canal de recirculación
+            elif gota.x >= CANAL_FIN_X - 40:
+                if CIRCULACION_ACTIVA:
+                    gota.en_recirculacion = True
+                    gota.x = CANAL_FIN_X + 10  # Posición inicial en recirculación
+                    gota.y = obtener_y_recirculacion(gota.x)
+                    gota.vel_y = 0
+                    nuevas_gotas.append(gota)
+                else:
+                    y_nueva = obtener_y_canal(CANAL_INICIO_X)
+                    gota.x = CANAL_INICIO_X + 10
+                    gota.y = y_nueva
+                    nuevas_gotas.append(gota)
+            
+            # Movimiento normal en canal principal (hacia la derecha)
             else:
                 nuevas_gotas.append(gota)
         
         self.gotas = nuevas_gotas
         
-        # Reciclar flujos cuando salen
+        # Procesar reactivos...
         if self.flujo_reactivo_a and self.flujo_reactivo_a.x > CANAL_FIN_X + 100:
             y_nueva = obtener_y_canal(CANAL_INICIO_X)
             self.flujo_reactivo_a.x = CANAL_INICIO_X + 50
@@ -193,6 +229,7 @@ class Simulador:
             y_nueva = obtener_y_canal(CANAL_INICIO_X)
             self.flujo_reactivo_b.x = CANAL_INICIO_X + 80
             self.flujo_reactivo_b.y = y_nueva
+            self.flujo_reactivo_b.largo = 0
     
     def calcular_reynolds_actual(self):
         """Calcula el Reynolds actual en tiempo real"""
@@ -244,12 +281,14 @@ class Simulador:
         for iman in imanes_arriba:
             iman.dibujar(pantalla)
         
-        # Canal y elementos estructurales
         dibujar_canal_serpenteante(pantalla)
         dibujar_entradas(pantalla)
         dibujar_bifurcacion_y(pantalla)
+        
+        # Dibujar canal de recirculación (NUEVO)
+        dibujar_canal_recirculacion(pantalla)
 
-    # 8. Flujos continuos
+        # 8. Flujos continuos
         if self.flujo_reactivo_a:
             self.flujo_reactivo_a.dibujar(pantalla)
         

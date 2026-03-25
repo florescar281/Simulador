@@ -92,7 +92,7 @@ COEFICIENTE_VISCOSIDAD_TEMP = 0.6  # Factor de reducción de viscosidad con temp
 # PARÁMETROS DE GENERACIÓN DE GOTAS
 # ============================================
 FRAMES_ENTRE_GOTAS = 100        # Aprox 0.66 segundos a 60 FPS
-MAX_GOTAS_SIMULTANEAS = 10
+MAX_GOTAS_SIMULTANEAS = 15
 
 # ============================================
 # INICIALIZACIÓN DE FUENTES
@@ -139,3 +139,14 @@ ESCALA_IMAN = 0.2  # Ajusta el tamaño
 LED_OFFSET_X = 35
 LED_OFFSET_Y = -25
 LED_RADIO = 8
+
+# ============================================
+# GEOMETRÍA DEL CANAL DE RECIRCULACIÓN
+# ============================================
+CIRCULACION_ACTIVA = True  # Activar/desactivar recirculación
+CIRCULACION_INICIO_X = CANAL_INICIO_X - 50
+CIRCULACION_FIN_X = CANAL_FIN_X + 50
+CIRCULACION_Y_OFFSET = 80   # Distancia vertical desde el canal principal
+VELOCIDAD_RECIRCULACION = 0.8  # Factor de velocidad en recirculación
+UMBRAL_ENTRADA_RECIRCULACION = 40   # Distancia desde el final para entrar
+UMBRAL_SALIDA_RECIRCULACION = 30    # Distancia desde el inicio para salir

@@ -67,10 +67,10 @@ class Renderer:
     
     def dibujar_titulo(self, pantalla):
         """Dibuja el título principal"""
-        titulo = FUENTE_TITULO.render("MICROREACTOR CON FERROFLUIDOS", True, CIAN)
+        titulo = FUENTE_TITULO.render("MICROREACTOR CON FERROFLUIDOS", True, NEGRO)
         pantalla.blit(titulo, (ANCHO//2 - titulo.get_width()//2, 10))
         
-        subtitulo = FUENTE.render("Sistema automático de transporte y mezcla", True, GRIS_CLARO)
+        subtitulo = FUENTE.render("Sistema automático de transporte y mezcla", True, GRIS_OSCURO)
         pantalla.blit(subtitulo, (ANCHO//2 - subtitulo.get_width()//2, 48))
     
     def dibujar_instrucciones(self, pantalla, fase, ciclos):

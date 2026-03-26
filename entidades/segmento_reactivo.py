@@ -141,6 +141,7 @@ class FlujoContinuo:
         # Generar nuevas partículas
         self.tiempo_entre_particulas += 1
         if self.tiempo_entre_particulas > 3:
+            # Posición de inicio: en el canal principal (para mantener flujo constante)
             y_nueva = obtener_y_canal(CANAL_INICIO_X + 20) + self.offset_y
             nueva_particula = ParticulaLiquida(CANAL_INICIO_X + 20, y_nueva, self.color)
             nueva_particula.nivel_mezcla = self.nivel_mezcla

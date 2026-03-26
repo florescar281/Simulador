@@ -128,7 +128,7 @@ class FlujoContinuo:
             
             p.mover(velocidad_actual, self.nivel_mezcla > 0.3, y_deseada)
             
-            if p.x < CANAL_FIN_X + 200:
+            if p.x < CANAL_FIN_X + 80:
                 particulas_activas.append(p)
             else:
                 p.x = CANAL_INICIO_X + random.uniform(0, 50)

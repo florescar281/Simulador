@@ -91,3 +91,170 @@ class Renderer:
             color = fases_colores.get(fase, CIAN) if i == 1 else (CIAN if i == 0 else BLANCO)
             render = FUENTE.render(texto, True, color)
             pantalla.blit(render, (30, ALTO - 75 + i * 22))
+
+    def dibujar_marco_reactor(self, pantalla):
+        """Dibuja un rectángulo con esquinas redondeadas como marco del reactor"""
+        # Definir el área del marco (ajusta estos valores según tu bandeja)
+        marco_x = CANAL_INICIO_X + 10
+        marco_y = CANAL_Y_BASE - 70
+        marco_ancho = CANAL_FIN_X - CANAL_INICIO_X - 100
+        marco_alto = 110
+        
+        # Color del marco (gris metálico con borde más oscuro)
+        color_fondo = (45, 45, 55)
+        color_borde = (120, 120, 140)
+        
+        # Dibujar rectángulo con esquinas redondeadas
+        self._dibujar_rect_redondeado(pantalla, marco_x, marco_y, marco_ancho, marco_alto, 
+                                      color_fondo, radio=15)
+        self._dibujar_rect_redondeado(pantalla, marco_x, marco_y, marco_ancho, marco_alto, 
+                                      color_borde, radio=15, grosor=2)
+        
+        # Efecto de brillo en los bordes (opcional)
+        self._dibujar_rect_redondeado(pantalla, marco_x + 2, marco_y + 2, 
+                                      marco_ancho - 4, marco_alto - 4, 
+                                      (70, 70, 85), radio=13, grosor=1)
+        
+        # Sombra para dar profundidad
+        self._dibujar_rect_redondeado(pantalla, marco_x + 3, marco_y + 3, 
+                                      marco_ancho - 6, marco_alto - 6, 
+                                      (25, 25, 35), radio=12, grosor=1)
+    
+    def _dibujar_rect_redondeado(self, pantalla, x, y, ancho, alto, color, radio=10, grosor=0):
+        """Dibuja un rectángulo con esquinas redondeadas"""
+        if grosor == 0:
+            # Rectángulo relleno
+            pygame.draw.rect(pantalla, color, (x + radio, y, ancho - 2 * radio, alto))
+            pygame.draw.rect(pantalla, color, (x, y + radio, ancho, alto - 2 * radio))
+            
+            # Esquinas redondeadas
+            pygame.draw.circle(pantalla, color, (x + radio, y + radio), radio)
+            pygame.draw.circle(pantalla, color, (x + ancho - radio, y + radio), radio)
+            pygame.draw.circle(pantalla, color, (x + radio, y + alto - radio), radio)
+            pygame.draw.circle(pantalla, color, (x + ancho - radio, y + alto - radio), radio)
+        else:
+            # Solo borde
+            # Líneas rectas
+            pygame.draw.line(pantalla, color, (x + radio, y), (x + ancho - radio, y), grosor)
+            pygame.draw.line(pantalla, color, (x + radio, y + alto), (x + ancho - radio, y + alto), grosor)
+            pygame.draw.line(pantalla, color, (x, y + radio), (x, y + alto - radio), grosor)
+            pygame.draw.line(pantalla, color, (x + ancho, y + radio), (x + ancho, y + alto - radio), grosor)
+            
+            # Esquinas redondeadas
+            pygame.draw.arc(pantalla, color, (x, y, radio * 2, radio * 2), math.pi, math.pi * 1.5, grosor)
+            pygame.draw.arc(pantalla, color, (x + ancho - radio * 2, y, radio * 2, radio * 2), math.pi * 1.5, math.pi * 2, grosor)
+            pygame.draw.arc(pantalla, color, (x, y + alto - radio * 2, radio * 2, radio * 2), math.pi * 0.5, math.pi, grosor)
+            pygame.draw.arc(pantalla, color, (x + ancho - radio * 2, y + alto - radio * 2, radio * 2, radio * 2), 0, math.pi * 0.5, grosor)
+
+    def dibujar_marco_reactor_2(self, pantalla):
+        """Dibuja un rectángulo con esquinas redondeadas como marco del reactor"""
+        # Definir el área del marco (ajusta estos valores según tu bandeja)
+        marco_x = CANAL_INICIO_X + 40
+        marco_y = 130
+        marco_ancho = CANAL_FIN_X - CANAL_INICIO_X - 190
+        marco_alto = 270
+        
+        # Color del marco (gris metálico con borde más oscuro)
+        color_fondo = (45, 45, 55)
+        color_borde = (120, 120, 140)
+        
+        # Dibujar rectángulo con esquinas redondeadas
+        self._dibujar_rect_redondeado(pantalla, marco_x, marco_y, marco_ancho, marco_alto, 
+                                      color_fondo, radio=15)
+        self._dibujar_rect_redondeado(pantalla, marco_x, marco_y, marco_ancho, marco_alto, 
+                                      color_borde, radio=15, grosor=2)
+        
+        # Efecto de brillo en los bordes (opcional)
+        self._dibujar_rect_redondeado(pantalla, marco_x + 2, marco_y + 2, 
+                                      marco_ancho - 4, marco_alto - 4, 
+                                      (70, 70, 85), radio=13, grosor=1)
+        
+        # Sombra para dar profundidad
+        self._dibujar_rect_redondeado(pantalla, marco_x + 3, marco_y + 3, 
+                                      marco_ancho - 6, marco_alto - 6, 
+                                      (25, 25, 35), radio=12, grosor=1)
+    def dibujar_marco_reactor_3(self, pantalla):
+        """Dibuja un rectángulo con esquinas redondeadas como marco del reactor"""
+        # Definir el área del marco (ajusta estos valores según tu bandeja)
+        marco_x = CANAL_FIN_X - 180
+        marco_y = CANAL_Y_BASE - 70
+        marco_ancho = CANAL_INICIO_X + 100
+        marco_alto = 240
+        
+        # Color del marco (gris metálico con borde más oscuro)
+        color_fondo = GRIS_CLARO 
+        color_borde = (120, 120, 140)
+        
+        # Dibujar rectángulo con esquinas redondeadas
+        self._dibujar_rect_redondeado(pantalla, marco_x, marco_y, marco_ancho, marco_alto, 
+                                      color_fondo, radio=15)
+        self._dibujar_rect_redondeado(pantalla, marco_x, marco_y, marco_ancho, marco_alto, 
+                                      color_borde, radio=15, grosor=2)
+        
+        # Efecto de brillo en los bordes (opcional)
+        self._dibujar_rect_redondeado(pantalla, marco_x + 2, marco_y + 2, 
+                                      marco_ancho - 4, marco_alto - 4, 
+                                      (70, 70, 85), radio=13, grosor=1)
+        
+        # Sombra para dar profundidad
+        self._dibujar_rect_redondeado(pantalla, marco_x + 3, marco_y + 3, 
+                                      marco_ancho - 6, marco_alto - 6, 
+                                      (25, 25, 35), radio=12, grosor=1)
+    
+    def dibujar_marco_reactor_4(self, pantalla):
+            """Dibuja un rectángulo con esquinas redondeadas como marco del reactor"""
+            # Definir el área del marco (ajusta estos valores según tu bandeja)
+            marco_x = CANAL_INICIO_X - 100
+            marco_y = CANAL_Y_BASE - 70
+            marco_ancho = 200
+            marco_alto = 140
+            
+            # Color del marco (gris metálico con borde más oscuro)
+            color_fondo = GRIS_CLARO 
+            color_borde = (120, 120, 140)
+            
+            # Dibujar rectángulo con esquinas redondeadas
+            self._dibujar_rect_redondeado(pantalla, marco_x, marco_y, marco_ancho, marco_alto, 
+                                        color_fondo, radio=15)
+            self._dibujar_rect_redondeado(pantalla, marco_x, marco_y, marco_ancho, marco_alto, 
+                                        color_borde, radio=15, grosor=2)
+            
+            # Efecto de brillo en los bordes (opcional)
+            self._dibujar_rect_redondeado(pantalla, marco_x + 2, marco_y + 2, 
+                                        marco_ancho - 4, marco_alto - 4, 
+                                        (70, 70, 85), radio=13, grosor=1)
+            
+            # Sombra para dar profundidad
+            self._dibujar_rect_redondeado(pantalla, marco_x + 3, marco_y + 3, 
+                                        marco_ancho - 6, marco_alto - 6, 
+                                        (25, 25, 35), radio=12, grosor=1)
+        
+
+    def dibujar_marco_reactor_5(self, pantalla):
+        """Dibuja un rectángulo con esquinas redondeadas como marco del reactor"""
+        # Definir el área del marco (ajusta estos valores según tu bandeja)
+        marco_x = CANAL_INICIO_X - 140
+        marco_y = 80
+        marco_ancho = CANAL_FIN_X - CANAL_INICIO_X + 300
+        marco_alto = 400
+        
+        # Color del marco (gris metálico con borde más oscuro)
+        color_fondo = GRIS
+        color_borde = (120, 120, 140)
+        
+        # Dibujar rectángulo con esquinas redondeadas
+        self._dibujar_rect_redondeado(pantalla, marco_x, marco_y, marco_ancho, marco_alto, 
+                                      color_fondo, radio=15)
+        self._dibujar_rect_redondeado(pantalla, marco_x, marco_y, marco_ancho, marco_alto, 
+                                      color_borde, radio=15, grosor=2)
+        
+        # Efecto de brillo en los bordes (opcional)
+        self._dibujar_rect_redondeado(pantalla, marco_x + 2, marco_y + 2, 
+                                      marco_ancho - 4, marco_alto - 4, 
+                                      (70, 70, 85), radio=13, grosor=1)
+        
+        # Sombra para dar profundidad
+        self._dibujar_rect_redondeado(pantalla, marco_x + 3, marco_y + 3, 
+                                      marco_ancho - 6, marco_alto - 6, 
+                                      (25, 25, 35), radio=12, grosor=1)
+    

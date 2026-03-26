@@ -343,8 +343,17 @@ class Simulador:
         # Fondo
         self.renderer.dibujar_fondo(pantalla)
         
+        # Base del reactor
+        self.renderer.dibujar_marco_reactor_5(pantalla)
+        self.renderer.dibujar_marco_reactor_3(pantalla)
+        self.renderer.dibujar_marco_reactor_4(pantalla)
+        
         # Dibujar imagen base del reactor (cubre todo el canal)
         self.renderer.dibujar_reactor(pantalla)
+
+        # Dibujar marco del reactor
+        self.renderer.dibujar_marco_reactor_2(pantalla)
+        self.renderer.dibujar_marco_reactor(pantalla)
         
         # Título
         self.renderer.dibujar_titulo(pantalla)
